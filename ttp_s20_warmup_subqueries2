@@ -23,9 +23,33 @@ FROM customer_totals;
 
 -- YOUR TURN: what is the average of the amount of stock each store has in their inventory? (Use inventory table)
 
+SELECT store_id, AVG(total_inventory)
+FROM (SELECT store_id, SUM(inventory_id) AS total_inventory
+FROM inventory 
+GROUP BY store_id) as totals
+GROUP BY store_id;
 
 -- YOUR TURN: What is the average customer lifetime spending, for each staff member?
 -- HINT: you can work off the example
 
+SELECT staff_id, AVG(total)
+FROM (SELECT staff_id, SUM(amount) as total
+FROM payment
+GROUP BY staff_id) as staff_totals
+GROUP BY staff_id;
+
 --YOUR TURN: 
 --What is the average number of films we have per genre (category)?
+
+WITH genres AS (
+    SELECT c.name, SUM(fc.film_id) as totals
+    FROM category c
+    JOIN film_category fc 
+    ON c.category_id = fc.category_id
+    GROUP BY c.name
+)
+
+SELECT name, AVG(totals)
+FROM genres
+GROUP BY name;
+
